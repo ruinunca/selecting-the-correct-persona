@@ -45,6 +45,7 @@ def process_persona(args):
 
     all_personas_dict = {}
     all_persona_sentences_dict = {}
+    dataset2persona = {}
 
     for split in ['train', 'valid', 'test']:
         # Statistics
@@ -67,7 +68,6 @@ def process_persona(args):
         dialogues2persona = []
         dialogue2persona = {}
         turns2persona = []
-        dataset2persona = {}
 
         for line in tqdm(lines, desc=f"Processing {split} split"):
             line = line.strip().replace('\\n', '\n')
@@ -160,7 +160,6 @@ def process_persona(args):
     with open(persona_sentences_path, "w") as f:
         json.dump(all_persona_sentences_dict, f, indent=4)
 
-    
     for split, dialogues2persona in dataset2persona.items():
         
         for dialogue in dialogues2persona:
@@ -170,8 +169,7 @@ def process_persona(args):
 
         with open(dialogue2persona_path, "w") as f:
             json.dump(dialogues2persona, f, indent=4)
-
-
+        
     
 
 if __name__ == "__main__":
