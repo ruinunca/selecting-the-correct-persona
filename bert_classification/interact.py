@@ -6,7 +6,7 @@ from argparse import ArgumentParser, Namespace
 
 import yaml
 
-from classifier import Classifier
+from models.bert_models import Classifier
 
 
 def load_model_from_experiment(experiment_folder: str):

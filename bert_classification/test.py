@@ -9,7 +9,7 @@ import yaml
 from sklearn.metrics import classification_report
 from tqdm import tqdm
 
-from classifier import Classifier
+from models.bert_models import Classifier
 
 
 def load_model_from_experiment(experiment_folder: str):

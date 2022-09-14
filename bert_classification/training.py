@@ -5,7 +5,7 @@ import argparse
 import os
 from datetime import datetime
 
-from classifier import Classifier
+from models.bert_models import Classifier
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from pytorch_lightning.loggers import LightningLoggerBase, TensorBoardLogger

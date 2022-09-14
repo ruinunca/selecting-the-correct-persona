@@ -14,7 +14,7 @@ from torchnlp.encoders import LabelEncoder
 from torchnlp.utils import collate_tensors, lengths_to_mask
 from transformers import AutoModel
 
-from tokenizer import Tokenizer
+from models.tokenizer import Tokenizer
 from utils import mask_fill
 
 

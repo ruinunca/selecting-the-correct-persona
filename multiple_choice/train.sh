@@ -1,0 +1,1 @@
+CUDA_DEVICE_ORDER=PCI_BUS_ID CUDA_VISIBLE_DEVICES=$1 python run_multiple_choice.py --model_name_or_path $2 --task_name persona --output_dir experiments --do_eval --do_train --per_device_train_batch_size $3 --per_device_eval_batch_size $3 
