@@ -86,6 +86,12 @@ class DataTrainingArguments:
     overwrite_cache: bool = field(
         default=False, metadata={"help": "Overwrite the cached training and evaluation sets"}
     )
+    num_distractors: int = field(
+        default=4,
+        metadata={
+            "help": "The number of distractors used for training the model. "
+        },
+    )
 
 
 def main():
@@ -128,7 +134,7 @@ def main():
     set_seed(training_args.seed)
 
     try:
-        processor = processors[data_args.task_name]()
+        processor = processors[data_args.task_name](data_args.num_distractors)
         label_list = processor.get_labels()
         num_labels = len(label_list)
     except KeyError:
@@ -163,6 +169,7 @@ def main():
             data_dir=data_args.data_dir,
             tokenizer=tokenizer,
             task=data_args.task_name,
+            num_distractors=data_args.num_distractors,
             max_seq_length=data_args.max_seq_length,
             overwrite_cache=data_args.overwrite_cache,
             mode=Split.train,
@@ -175,6 +182,7 @@ def main():
             data_dir=data_args.data_dir,
             tokenizer=tokenizer,
             task=data_args.task_name,
+            num_distractors=data_args.num_distractors,
             max_seq_length=data_args.max_seq_length,
             overwrite_cache=data_args.overwrite_cache,
             mode=Split.dev,

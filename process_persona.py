@@ -163,7 +163,13 @@ def process_persona(args):
     for split, dialogues2persona in dataset2persona.items():
         
         for dialogue in dialogues2persona:
-            dialogue['distractors'] = random.sample(all_personas, DISTRACTORS)
+            found_duplicate = 1
+            while found_duplicate:
+                distractors = random.sample(all_personas, DISTRACTORS)
+                if not dialogue['persona_1'] in distractors and not dialogue['persona_2'] in distractors:
+                    found_duplicate = 0
+                
+            dialogue['distractors'] = distractors
 
         dialogue2persona_path = os.path.join(processed_dir, 'dialogue2persona_' + split + '.json')
 

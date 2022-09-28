@@ -2,11 +2,13 @@ import json
 import logging
 import os
 import torch
+from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional
 
 import tqdm
+import numpy as np
 from filelock import FileLock
 
 from transformers import PreTrainedTokenizer, is_tf_available, is_torch_available
@@ -52,6 +54,7 @@ class Split(Enum):
     train = "train"
     dev = "dev"
     test = "test"
+    file = "file"
 
 
 class MultipleChoiceDataset(Dataset):
@@ -67,15 +70,24 @@ class MultipleChoiceDataset(Dataset):
         data_dir: str,
         tokenizer: PreTrainedTokenizer,
         task: str,
+        num_distractors: int,
         max_seq_length: Optional[int] = None,
         overwrite_cache=False,
         mode: Split = Split.train,
     ):
-        processor = processors[task]()
+        processor = processors[task](num_distractors)
+
+        folder_dir = data_dir
+        name = mode.value
+
+        if mode == Split.file:
+            path = Path(data_dir)
+            folder_dir = str(path.parent)
+            name = path.stem
 
         cached_features_file = os.path.join(
-            data_dir,
-            "cached_{}_{}_{}_{}".format(mode.value, tokenizer.__class__.__name__, str(max_seq_length), task,),
+            folder_dir,
+            "cached_{}_{}_{}_{}_distractors_{}".format(name, tokenizer.__class__.__name__, str(max_seq_length), task, num_distractors),
         )
 
         # Make sure only the first process in distributed training processes the dataset,
@@ -93,6 +105,8 @@ class MultipleChoiceDataset(Dataset):
                     examples = processor.get_dev_examples(data_dir)
                 elif mode == Split.test:
                     examples = processor.get_test_examples(data_dir)
+                elif mode == Split.file:
+                    examples = processor.get_test_examples_from_file(data_dir)
                 else:
                     examples = processor.get_train_examples(data_dir)
                 logger.info("Training examples: %s", len(examples))
@@ -118,6 +132,8 @@ class MultipleChoiceDataset(Dataset):
 
 class DataProcessor:
     """Base class for data converters for multiple choice data sets."""
+    def __init__(self, num_distractors):
+        self.num_distractors = num_distractors
 
     def get_train_examples(self, data_dir):
         """Gets a collection of `InputExample`s for the train set."""
@@ -160,9 +176,15 @@ class PersonaProcessor(DataProcessor):
         data = self._read_json(path)
         return self._create_examples(data, "test")
 
+    def get_test_examples_from_file(self, path):
+        """See base class."""
+        logger.info("LOOKING AT {} test".format(path))
+        data = self._read_json(path)
+        return self._create_examples(data, "file")
+
     def get_labels(self):
         """See base class."""
-        return list(range(MULTIPLE_CHOICE_TASKS_NUM_LABELS["persona"]))
+        return list(range(self.num_distractors))
 
     def _read_json(self, path):
         data = []
@@ -173,14 +195,13 @@ class PersonaProcessor(DataProcessor):
     def _create_examples(self, dialogues_raw, set_type):
         """Creates examples for the training and dev sets."""
         examples = []
-        candidates =  MULTIPLE_CHOICE_TASKS_NUM_LABELS['persona']
-        distractors = candidates - 1
+        candidates =  self.num_distractors + 1
         
         for i, dial_raw in enumerate(dialogues_raw):
             turns_1 = [turn['speaker_1'] for turn in dial_raw['turns']]
             turns_2 = [turn['speaker_2'] for turn in dial_raw['turns']]
             
-            personas = [" ".join(dial_raw['persona_1'])] + [" ".join(persona) for persona in dial_raw['distractors'][:distractors]]
+            personas = [" ".join(dial_raw['persona_1'])] + [" ".join(persona) for persona in dial_raw['distractors'][:self.num_distractors]]
             dialogues = [" ".join(turns_1)] * candidates
 
 
