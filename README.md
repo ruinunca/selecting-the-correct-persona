@@ -1,104 +1,140 @@
-# Minimalist Implementation of a BERT Sentence Classifier
+# Learning to Identify Personas in Open-Domain Dialogue Systems
 
-This repo is a minimalist implementation of a BERT Sentence Classifier.
-The goal of this repo is to show how to combine 3 of my favourite libraries to supercharge your NLP research.
+This repository provides the implementation code for the <insert_conference_name> main conference paper:
 
-My favourite libraries:
-- [PyTorch-Lightning](https://pytorch-lightning.readthedocs.io/en/latest/)
-- [Transformers](https://huggingface.co/transformers/index.html)
-- [PyTorch-NLP](https://pytorchnlp.readthedocs.io/en/latest/index.html)
+**Learning to Identify Personas in Open-Domain Dialogue Systems**. [[paper]](https://google.com)
 
 
-## Requirements:
+## 0. Requirements:
 
 This project uses Python 3.6
 
 Create a virtual env with (outside the project folder):
 
 ```bash
-virtualenv -p python3.6 sbert-env
-source sbert-env/bin/activate
+virtualenv -p python3.6 pers-env
+source pers-env/bin/activate
 ```
 
 Install the requirements (inside the project folder):
 ```bash
+git clone git@github.com:ruinunca/finding_personas.git
+cd finding_personas
 pip install -r requirements.txt
 ```
 
-## Getting Started:
+## 1. Data Preparation
 
-### Train:
+In this work, we carried out experiments using **PersonaChat**, a dataset that contains 3 to 5 profile sentences (persona) for each speaker.
+We introduce modifications to the dataset in order to build the task of identifying the correct persona amongst distractors.
+
+### Download PersonaChat
+
+First, download PersonaChat dataset from Parlai in [this link](http://parl.ai/downloads/personachat/personachat.tgz).
+Create a folder named `data/` on the project root and place it there:
+
 ```bash
-python training.py
+mkdir data/
+cd data/
+wget http://parl.ai/downloads/personachat/personachat.tgz
+tar -xvzf personachat.tgz
+```
+
+
+### Process Dataset:
+```bash
+python process_persona.py --path data/personachat --format both_original
 ```
 
 Available commands:
-
-Training arguments:
 ```bash
 optional arguments:
-  --seed                      Training seed.
-  --batch_size                Batch size to be used.
-  --accumulate_grad_batches   Accumulated gradients runs K small batches of \
-                              size N before doing a backwards pass.
-  --val_percent_check         If you dont want to use the entire dev set, set \
-                              how much of the dev set you want to use with this flag.      
+  --path                      Path to personachat folder.
+  --format                    Format to be used.
+
+formats:
+  none                        Only uses dialogues.        
+  self_original               Only uses persona from Speaker 1.
+  self_revised                Only uses revised persona from Speaker 1.
+  other_original              Only uses persona from Speaker 2.
+  other_revised               Only uses revised persona from Speaker 2.
+  both_original               Uses both personas.
+  both_revised                Uses both revised personas.
 ```
 
-Early Stopping/Checkpoint arguments:
+Create permutations distractors for dataset:
 ```bash
+python create_similar_distractors.py --path data/personachat/processed/both_original/
+
 optional arguments:
-  --metric_mode             If we want to min/max the monitored quantity.
-  --min_epochs              Limits training to a minimum number of epochs
-  --max_epochs              Limits training to a max number number of epochs
-  --save_top_k              The best k models according to the quantity \
-                            monitored will be saved.
+  --path                      Path to processed dataset folder.
 ```
 
-Model arguments:
+## Training
+
+We provide scripts that can be customised.
+You can either use the script:
 
 ```bash
-optional arguments:
-  --encoder_model             BERT encoder model to be used.
-  --encoder_learning_rate     Encoder specific learning rate.
-  --nr_frozen_epochs          Number of epochs we will keep the BERT parameters frozen.
-  --learning_rate             Classification head learning rate.
-  --dropout                   Dropout to be applied to the BERT embeddings.
-  --train_csv                 Path to the file containing the train data.
-  --dev_csv                   Path to the file containing the dev data.
-  --test_csv                  Path to the file containing the test data.
-  --loader_workers            How many subprocesses to use for data loading.
+./train.sh <gpus> <model_name_or_path> <batch_size>
 ```
+
+Or run the Python file:
+
+```bash
+python run_multiple_choice.py \
+--model_name_or_path google/bert_uncased_L-2_H-128_A-2 \
+--task_name persona \
+--output_dir experiments \
+--do_eval \
+--do_train \
+--warmup_steps 200 \
+--per_device_train_batch_size 8 \
+--per_device_eval_batch_size 8 \
+--gradient_accumulation_steps 2
+```
+
 
 **Note:**
 After BERT several BERT-like models were released. You can test different size models like Mini-BERT and DistilBERT which are much smaller.
-- Mini-BERT only contains 2 encoder layers with hidden sizes of 128 features. Use it with the flag: `--encoder_model google/bert_uncased_L-2_H-128_A-2`
-- DistilBERT contains only 6 layers with hidden sizes of 768 features. Use it with the flag: `--encoder_model distilbert-base-uncased`
+- Mini-BERT only contains 2 encoder layers with hidden sizes of 128 features. Use it with the flag: `--model_name_or_path google/bert_uncased_L-2_H-128_A-2`
+- DistilBERT contains only 6 layers with hidden sizes of 768 features. Use it with the flag: `--model_name_or_path distilbert-base-uncased`
 
-Training command example:
+
+## Testing
+
+### Generating the Results
+
+First, we need to test the model by generating the results for the test set. After that, we will evaluate the results using another script:
+
 ```bash
-python training.py \
-    --gpus 0 \
-    --batch_size 32 \
-    --accumulate_grad_batches 1 \
-    --loader_workers 8 \
-    --nr_frozen_epochs 1 \
-    --encoder_model google/bert_uncased_L-2_H-128_A-2 \
-    --train_csv data/MP2_train.csv \
-    --dev_csv data/MP2_dev.csv \
+python predict_results.py --task_name persona \
+--model_name_or_path experiments/experiment_2022-09-15_14-20-49 / 
+--test_file ../data/personachat/processed/both_original/tests/deletion_1.json
 ```
 
-Testing the model:
+Available commands:
 ```bash
-python test.py --experiment experiments/version_{date} --test_data data/MP2_dev.csv
+optional arguments:
+--model_name_or_path          Path to pretrained model
+--task_name                   persona (this is fixed)
+--test_file                   Should contain the test data
+--max_seq_length              The maximum total input sequence length after tokenization. Sequences longer than this will be truncated, sequences shorter will be padded.
+--num_distractors             The number of distractors used for training the model. (default: 9)
 ```
 
-### Tensorboard:
+### Evaluating the Results
+
+Now, we run a script to get the results of MRR, Accuracy, and other metrics that could be added:
+
+```bash
+python evaluate_results.py --path experiments/experiment_2022-09-15_14-20-49/results/
+```
+
+
+### Tensorboard (SOON):
 
 Launch tensorboard with:
 ```bash
 tensorboard --logdir="experiments/"
 ```
-
-### Code Style:
-To make sure all the code follows the same style we use [Black](https://github.com/psf/black).
