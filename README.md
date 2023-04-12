@@ -1,8 +1,8 @@
-# Learning to Identify Personas in Open-Domain Dialogue Systems
+# Who Said That? Selecting the Correct Persona from Conversational Text
 
 This repository provides the implementation code for the <insert_conference_name> main conference paper:
 
-**Learning to Identify Personas in Open-Domain Dialogue Systems**. [[paper]](https://google.com)
+**Who Said That? Selecting the Correct Persona from Conversational Text**. [[paper]](#)
 
 
 ## 0. Requirements:
@@ -18,8 +18,8 @@ source pers-env/bin/activate
 
 Install the requirements (inside the project folder):
 ```bash
-git clone git@github.com:ruinunca/finding_personas.git
-cd finding_personas
+git clone git@github.com:ruinunca/selecting-the-correct-persona.git
+cd selecting-the-correct-persona
 pip install -r requirements.txt
 ```
 
@@ -129,12 +129,4 @@ Now, we run a script to get the results of MRR, Accuracy, and other metrics that
 
 ```bash
 python evaluate_results.py --path experiments/experiment_2022-09-15_14-20-49/results/
-```
-
-
-### Tensorboard (SOON):
-
-Launch tensorboard with:
-```bash
-tensorboard --logdir="experiments/"
 ```
