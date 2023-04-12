@@ -152,7 +152,7 @@ if __name__ == "__main__":
     # ARGUMENTS
     # ------------------------
     parser = argparse.ArgumentParser(
-        description="Minimalist Transformer Classifier",
+        description="Create perturbations from processed PersonaChat dataset.",
         add_help=True,
     )
     parser.add_argument("--path", type=str, default="data/personachat/processed/both_original", help="Path to processed personachat folder.")
