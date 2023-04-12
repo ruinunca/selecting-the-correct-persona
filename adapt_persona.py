@@ -183,7 +183,7 @@ if __name__ == "__main__":
     # ARGUMENTS
     # ------------------------
     parser = argparse.ArgumentParser(
-        description="Minimalist Transformer Classifier",
+        description="Adapt persona for the selection task.",
         add_help=True,
     )
     parser.add_argument("--format", required=True, type=str, help="Format of output.", choices=['none', 'self_original', 'self_revised', 'other_original', 'other_revised', 'both_original', 'both_revised'])

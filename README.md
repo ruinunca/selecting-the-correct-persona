@@ -26,7 +26,7 @@ pip install -r requirements.txt
 ## 1. Data Preparation
 
 In this work, we carried out experiments using **PersonaChat**, a dataset that contains 3 to 5 profile sentences (persona) for each speaker.
-We introduce modifications to the dataset in order to build the task of identifying the correct persona amongst distractors.
+We adapt the dataset in order to build the task of identifying the correct persona amongst distractors.
 
 ### Download PersonaChat
 
@@ -43,7 +43,7 @@ tar -xvzf personachat.tgz
 
 ### Process Dataset:
 ```bash
-python process_persona.py --path data/personachat --format both_original
+python adapt_persona.py --path data/personachat --format both_original
 ```
 
 Available commands:
@@ -64,7 +64,7 @@ formats:
 
 Create permutations distractors for dataset:
 ```bash
-python create_similar_distractors.py --path data/personachat/processed/both_original/
+python create_perturbations.py --path data/personachat/processed/both_original/
 
 optional arguments:
   --path                      Path to processed dataset folder.
@@ -109,7 +109,7 @@ First, we need to test the model by generating the results for the test set. Aft
 
 ```bash
 python predict_results.py --task_name persona \
---model_name_or_path experiments/experiment_2022-09-15_14-20-49 / 
+--model_name_or_path experiments/experiment_2023-03-15_14-20-49 / 
 --test_file ../data/personachat/processed/both_original/tests/deletion_1.json
 ```
 
@@ -128,5 +128,5 @@ optional arguments:
 Now, we run a script to get the results of MRR, Accuracy, and other metrics that could be added:
 
 ```bash
-python evaluate_results.py --path experiments/experiment_2022-09-15_14-20-49/results/
+python evaluate_results.py --path experiments/experiment_2023-03-15_14-20-49/results/
 ```

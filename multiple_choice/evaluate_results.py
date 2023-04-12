@@ -1,15 +1,9 @@
 import argparse
 import os
-import re
 import json
-import random
 import numpy as np
 
 from pathlib import Path
-
-from tqdm import tqdm
-from copy import deepcopy
-import itertools
 
 
 def mean_reciprocal_rank(rs):
@@ -106,7 +100,7 @@ if __name__ == "__main__":
     # ARGUMENTS
     # ------------------------
     parser = argparse.ArgumentParser(
-        description="Minimalist Transformer Classifier",
+        description="Evaluate results from persona selection.",
         add_help=True,
     )
     parser.add_argument("--path", type=str, help="Path to processed personachat folder.", required=True)

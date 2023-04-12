@@ -1,22 +1,3 @@
-# coding=utf-8
-# Copyright 2018 The Google AI Language Team Authors and The HuggingFace Inc. team.
-# Copyright (c) 2018, NVIDIA CORPORATION.  All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-""" Finetuning the library models for multiple choice (Bert, Roberta, XLNet)."""
-
-
-import enum
 import logging
 import os, json
 from dataclasses import dataclass, field
@@ -32,9 +13,7 @@ from transformers import (
     AutoConfig,
     AutoModelForMultipleChoice,
     AutoTokenizer,
-    EvalPrediction,
     HfArgumentParser,
-    Trainer,
     set_seed,
 )
 from utils import MultipleChoiceDataset, Split, processors
@@ -167,34 +146,6 @@ def main():
         overwrite_cache=data_args.overwrite_cache,
         mode=Split.file,
     )
-
-    def compute_metrics(p: EvalPrediction) -> Dict:
-        preds = np.argmax(p.predictions, axis=1)
-        return {"acc": simple_accuracy(preds, p.label_ids)}
-
-    # Initialize our Trainer
-    """trainer = Trainer(
-        model=model,
-        eval_dataset=eval_dataset,
-
-        compute_metrics=compute_metrics,
-    )
-
-    # Evaluation
-    results = {}
-    logger.info("*** Evaluate ***")
-
-    result = trainer.evaluate()
-
-    output_eval_file = os.path.join(model_args.model_name_or_path, "eval_results.txt")
-    with open(output_eval_file, "w") as writer:
-        logger.info("***** Eval results *****")
-        for key, value in result.items():
-            logger.info("  %s = %s", key, value)
-            writer.write("%s = %s\n" % (key, value))
-
-        results.update(result)"""
-
     
     # Test
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

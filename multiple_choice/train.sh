@@ -2,7 +2,7 @@
 
 display_usage() { 
 	echo -e "\nUsage: $0 <gpus> <model_name_or_path> <batch_size> \n" 
-	} 
+} 
 # if less than two arguments supplied, display usage 
 if [  $# -le 2 ] 
 then 
