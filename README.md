@@ -1,6 +1,6 @@
 # Who Said That? Selecting the Correct Persona from Conversational Text
 
-This repository provides the implementation code for the <insert_conference_name> main conference paper:
+This repository provides the implementation code for the 23rd ACM International Conference on Intelligent Virtual Agents main conference paper:
 
 **Who Said That? Selecting the Correct Persona from Conversational Text**. [[paper]](#)
 
