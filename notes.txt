@@ -1,0 +1,9 @@
+CUDA_DEVICE_ORDER=PCI_BUS_ID CUDA_VISIBLE_DEVICES=5 python evaluate_multiple_choice.py --task_name persona --test_file ../data/personachat/processed/both_original/tests/permutation.json  --model_name_or_path experiments/experiment_2022
+CUDA_DEVICE_ORDER=PCI_BUS_ID CUDA_VISIBLE_DEVICES=4 python predict_results.py --task_name persona --test_file ../data/personachat/processed/both_original/tests/permutation.json --model_name_or_path experiments/experiment_2022-09-15_10-57-46/
+
+# Predict Results
+CUDA_DEVICE_ORDER=PCI_BUS_ID CUDA_VISIBLE_DEVICES=5 python predict_results.py --task_name persona --model_name_or_path experiments/bert_google_small/experiment_2022-09-15_14-20-49/ --test_file ../data/personachat/processed/both_original/dialogue2persona_test.json
+
+# Evaluate Results
+
+python evaluate_results.py --path experiments/bert_google_small/experiment_2022-09-15_14-20-49/results/dialogue2persona_test.json
